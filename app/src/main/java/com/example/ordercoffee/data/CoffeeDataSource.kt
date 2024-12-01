@@ -10,7 +10,7 @@ object CoffeeDataSource {
         CoffeeProduct(1, "Espresso", 3, R.drawable.coffee_img_01),
         CoffeeProduct(2, "Americano", 4, R.drawable.coffee_img_02),
         CoffeeProduct(3, "Latte", 5, R.drawable.coffee_img_03),
-        CoffeeProduct(4, "Cappuccino", 6, R.drawable.coffee_img_04),
+        CoffeeProduct(4, "Macchiato", 6, R.drawable.coffee_img_04),
         CoffeeProduct(5, "Tra dao", 3, R.drawable.coffee_img_05),
         CoffeeProduct(6, "Tra chanh", 4, R.drawable.coffee_img_06),
         CoffeeProduct(7, "Sinh to xoai", 5, R.drawable.coffee_img_07),

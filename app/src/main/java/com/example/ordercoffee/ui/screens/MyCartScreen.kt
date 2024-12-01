@@ -6,6 +6,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -31,6 +33,9 @@ import com.example.ordercoffee.data.ItemCart
 import com.example.ordercoffee.data.CoffeeDataSource.PersonObject
 import com.example.ordercoffee.data.Order
 import java.time.LocalDateTime
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import kotlinx.coroutines.*
 
 
 @Composable
@@ -55,7 +60,7 @@ fun MyCartScreen(navController: NavController) {
                 ) {
                     Column {
                         Text(
-                            text = "Tổng tiền",
+                            text = "Total Price",
                             style = LocalTextStyle.current.copy(
                                 color = Color.White,
                                 fontSize = 16.sp
@@ -97,7 +102,7 @@ fun MyCartScreen(navController: NavController) {
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Thanh toán",
+                            text = "Checkout",
                             style = LocalTextStyle.current.copy(
                                 color = Color(0xFF78B3CE),
                                 fontSize = 16.sp,
@@ -124,67 +129,96 @@ fun MyCartScreen(navController: NavController) {
                     .size(30.dp)
                     .clickable { navController.popBackStack() }
             )
-            Text("Giỏ hàng của tôi", fontSize = 25.sp)
-            Spacer(modifier = Modifier.height(20.dp))
-            listCart.forEach { itemCart ->
-                CartItem(itemCart)
-                Spacer(modifier = Modifier.height(20.dp))
+            Text("My Cart", fontSize = 25.sp)
+            LazyColumn(
+                modifier = Modifier
+                    .padding(paddingValues)
+            ) {
+                items(listCart) { itemCart ->
+                    CartItem(itemCart, onDelete =
+                    {
+                        val updatedList = personState.value.ListCart.toMutableList().apply {
+                            remove(itemCart)
+                        }
+                        personState.value = personState.value.copy(ListCart = updatedList)
+                    })
+                }
             }
         }
     }
 }
 
 @Composable
-fun CartItem(itemCart: ItemCart) {
-    Row(
+fun CartItem(itemCart: ItemCart, onDelete:() -> Unit) {
+    val listState = rememberLazyListState()
+    LazyRow(
+        state = listState,
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(15.dp))
-            .background(Color(0xFFD4EBF8)),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Row(
-            modifier = Modifier.padding(vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(
-                painter = painterResource(itemCart.coffeeProduct.imageResId),
-                contentDescription = itemCart.coffeeProduct.name,
-                modifier = Modifier.size(90.dp, 70.dp)
-            )
-            Column {
-                Text(itemCart.coffeeProduct.name, fontSize = 16.sp)
-                Text("Số lượng: ${itemCart.quantity}", fontSize = 16.sp)
-                Text(
-                    "Tùy chọn: ${itemCart.shot}, ${itemCart.select}, ${itemCart.size}, ${itemCart.iceLevel}",
-                    fontSize = 12.sp
+        item {
+            Row(
+                modifier = Modifier
+                    .size(305.dp, 96.dp)
+                    .clip(RoundedCornerShape(15.dp))
+                    .background(Color(0xFFD4EBF8)),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    modifier = Modifier
+                        .padding(vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        painter = painterResource(itemCart.coffeeProduct.imageResId),
+                        contentDescription = itemCart.coffeeProduct.name,
+                        modifier = Modifier.size(90.dp, 70.dp)
+                    )
+                    Column {
+                        Text(itemCart.coffeeProduct.name, fontSize = 16.sp)
+                        Text("x${itemCart.quantity}", fontSize = 16.sp)
+                        Text(
+                            "${itemCart.shot}| ${itemCart.select}| ${itemCart.size}| ${itemCart.iceLevel}",
+                            fontSize = 12.sp
+                        )
+                    }
+                }
+                Row(
+                    modifier = Modifier.padding(end = 0.dp)
+                ) {
+                    val x = itemCart.TotalPrice
+                    Text("$$x", fontSize = 20.sp)
+                }
+            }
+        }
+        item {
+            Row(
+                modifier = Modifier
+                    .size(48.dp, 96.dp)
+                    .clip(RoundedCornerShape(15.dp))
+                    .background(Color(0xFFFFE5E5))
+                    .clickable {
+                        onDelete()
+                        CoroutineScope(Dispatchers.Main).launch {
+                            listState.scrollToItem(0)
+                        }
+                               },
+                // Thêm sự kiện click
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.iconly_light_outline_delete),
+                    contentDescription = "Remove Button",
+                    modifier = Modifier.size(24.dp)
                 )
             }
         }
-        Row(
-            modifier = Modifier.padding(end = 15.dp)
-        ) {
-            val x = itemCart.TotalPrice
-            Text("$$x", fontSize = 20.sp)
-        }
     }
+
 }
 
-@Composable
-fun DeleteButton(modifier: Modifier = Modifier) {
-    Row(
-        modifier = Modifier
-            .clip(RoundedCornerShape(15.dp))
-            .background(Color(0xFFFFE5E5)), // Thêm sự kiện click
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Image(
-            painter = painterResource(R.drawable.iconly_light_outline_delete),
-            contentDescription = "Remove Button",
-            modifier = Modifier.size(24.dp)
-        )
-    }
-}
 

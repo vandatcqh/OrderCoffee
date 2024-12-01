@@ -119,7 +119,7 @@ fun GreetingAndProfile(navController: NavController)
             Text(
                 text = "Good morning",
                 style = LocalTextStyle.current.copy(
-                    color = Color(0.85f, 0.85f, 0.85f, 1.0f),
+                    color = Color(0xFF78B3CE),
                     textAlign = TextAlign.Left,
                     fontSize = 14.sp
                 )

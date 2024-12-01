@@ -3,6 +3,7 @@ package com.example.ordercoffee.ui.screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
@@ -22,6 +23,7 @@ import com.example.ordercoffee.LoyaltyCard
 import com.example.ordercoffee.R
 import androidx.navigation.NavController
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import com.example.ordercoffee.data.CoffeeDataSource
 import com.example.ordercoffee.ui.components.CoffeeItem
 import androidx.compose.foundation.lazy.items
@@ -37,38 +39,62 @@ import com.example.ordercoffee.data.Person
 import com.example.ordercoffee.ui.components.BottomNavigation
 import kotlin.math.roundToInt
 import androidx.compose.runtime.*
+import androidx.compose.ui.text.font.FontWeight
 
-@Preview
+@Preview(widthDp = 325, heightDp = 812)
 @Composable
-fun SwipeableRow() {
-    var offsetX by remember { mutableStateOf(0f) }
-    val threshold = 100f // Ngưỡng để xác định khi nào hiển thị hàng bên cạnh
+fun ScaffoldWithHorizontalScroll() {
+    Scaffold(
+        content = { paddingValues ->
+            HorizontalScrollList(modifier = Modifier.padding(paddingValues))
+        }
+    )
+}
+
+@Composable
+fun HorizontalScrollList(modifier: Modifier = Modifier) {
+    var offsetX by remember { mutableStateOf(0f) } // Quản lý vị trí dịch chuyển danh sách
 
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(60.dp)
-            .background(Color.Gray)
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color.White)
             .pointerInput(Unit) {
                 detectHorizontalDragGestures { change, dragAmount ->
-                    offsetX += dragAmount
-                    if (offsetX > threshold) {
-                        // Hiển thị hàng bên cạnh
-                        // Thực hiện hành động mong muốn khi vuốt vượt quá ngưỡng
-                    }
                     change.consume()
+                    offsetX += dragAmount
                 }
             }
     ) {
-        Row(
+        LazyRow(
             modifier = Modifier
                 .offset { IntOffset(offsetX.roundToInt(), 0) }
-                .fillMaxSize()
-                .background(Color.White),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+                .fillMaxSize(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(16.dp)
         ) {
-            Text(text = "Nội dung hàng")
+            items(10) { index ->
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .background(
+                            when (index) {
+                                0 -> Color.Blue
+                                1 -> Color.Red
+                                2 -> Color.Yellow
+                                else -> Color.Green
+                            }
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Item $index",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
         }
     }
 }
+
