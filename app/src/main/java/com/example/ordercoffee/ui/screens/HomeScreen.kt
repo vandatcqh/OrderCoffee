@@ -35,7 +35,9 @@ import com.example.ordercoffee.ui.components.BottomNavigation
 
 @Composable
 fun HomeScreen(navController: NavController) {
+    val personState = PersonObject.current
     Scaffold(
+        containerColor = Color.White,
         bottomBar = {
             BottomAppBar(
                 containerColor =Color(0xFF78B3CE),
@@ -67,7 +69,7 @@ fun HomeScreen(navController: NavController) {
                 modifier = Modifier.padding(horizontal = 25.dp)
             )
             {
-                LoyaltyCard(5)
+                LoyaltyCard(personState.value.numLoyalty)
             }
             Spacer(modifier = Modifier.height(38.dp))
             MenuCoffee(navController)
@@ -187,6 +189,7 @@ fun MenuCoffee(navController : NavController)
                 ),
                 fontWeight = FontWeight.Bold
             )
+            Spacer(modifier = Modifier.height(15.dp))
             CoffeeList(navController)
             BottomNavigation(navController, "home")
         }

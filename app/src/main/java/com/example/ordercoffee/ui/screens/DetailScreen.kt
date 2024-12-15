@@ -45,13 +45,15 @@ fun DetailScreen(navController: NavController) {
     var selectedShot by remember { mutableStateOf(ItemCart.shot) }
     var selectedCup by remember { mutableStateOf(ItemCart.select) }
     var selectedSize by remember { mutableStateOf(ItemCart.size) }
-    var selectedIce by remember { mutableStateOf(ItemCart.iceLevel) }
+    val tmp = ItemCart.iceLevel
+    val restmp = tmp.dropLast(4)
+    var selectedIce by remember { mutableStateOf(restmp) }
     // Calculate total amount
     val basePrice by remember {
         derivedStateOf {
             when (selectedSize) {
-                "M" -> ItemCart.coffeeProduct.price + 5
-                "L" -> ItemCart.coffeeProduct.price + 10
+                "Medium" -> ItemCart.coffeeProduct.price + 5
+                "Large" -> ItemCart.coffeeProduct.price + 10
                 else -> ItemCart.coffeeProduct.price
             }
         }
@@ -184,7 +186,7 @@ fun DetailScreen(navController: NavController) {
         )
         OptionRow(
             label = "Size",
-            options = listOf("S", "M", "L"),
+            options = listOf("Small", "Medium", "Large"),
             selectedOption = selectedSize,
             onOptionSelected = { selectedSize = it }
         )
@@ -192,7 +194,7 @@ fun DetailScreen(navController: NavController) {
             label = "Ice",
             options = listOf("No", "Less", "Normal"),
             selectedOption = selectedIce,
-            onOptionSelected = { selectedIce = it }
+            onOptionSelected = { selectedIce = it}
         )
 
         Spacer(modifier = Modifier.height(150.dp))
@@ -226,11 +228,11 @@ fun DetailScreen(navController: NavController) {
                     coffeeProduct = ItemCart.coffeeProduct,
                     quantity = quantity,
                     TotalPrice = totalAmount,
-                    TotalPoint = quantity*12,
+                    TotalPoint = quantity*25,
                     shot = selectedShot,
                     select = selectedCup,
                     size = selectedSize,
-                    iceLevel = selectedIce
+                    iceLevel = selectedIce + " Ice"
                 )
                 val updatedListCart = personState.value.ListCart + itemCart
                 personState.value = personState.value.copy(ListCart = updatedListCart)

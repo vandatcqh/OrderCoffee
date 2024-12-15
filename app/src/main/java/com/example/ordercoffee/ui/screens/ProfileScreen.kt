@@ -32,12 +32,14 @@ import com.example.ordercoffee.data.CoffeeDataSource
 import com.example.ordercoffee.ui.components.CoffeeItem
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.layout.Row
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import com.example.ordercoffee.data.CoffeeDataSource.PersonObject
 
 
@@ -73,7 +75,7 @@ fun ProfileScreen(navController: NavController) {
             iconResId = R.drawable.icon_email_edit,
             label = "Email",
             value = person.email,
-            onValueChange = { personState.value = person.copy(email = it)}
+            onValueChange = { personState.value = person.copy(email = it) }
         )
 
         ProfileField(
@@ -93,7 +95,7 @@ fun ProfileScreen(navController: NavController) {
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "Save & Back",
+                text = "Back to Homescreen",
                 color = Color.White
                 //style = MaterialTheme.typography.button
             )
@@ -109,13 +111,17 @@ fun ProfileField(
     value: String,
     onValueChange: (String) -> Unit
 ) {
+    var isEditing by remember { mutableStateOf(false) }
+    var textValue by remember { mutableStateOf(value) }
+
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { isEditing = true }, // Mở hộp thoại khi nhấn
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row(
-            modifier = Modifier.weight(1f),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
@@ -124,9 +130,7 @@ fun ProfileField(
                 modifier = Modifier.size(42.dp)
             )
             Spacer(modifier = Modifier.width(16.dp))
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
+            Column {
                 Text(
                     text = label,
                     style = MaterialTheme.typography.labelSmall.copy(
@@ -134,22 +138,11 @@ fun ProfileField(
                         fontSize = 16.sp
                     )
                 )
-                OutlinedTextField(
-                    value = value,
-                    onValueChange = onValueChange,
-                    modifier = Modifier.fillMaxWidth(),
-                    textStyle = MaterialTheme.typography.bodyLarge.copy(
+                Text(
+                    text = value,
+                    style = MaterialTheme.typography.bodyLarge.copy(
                         color = Color(0xFF334A59),
                         fontSize = 15.sp
-                    ),
-                    singleLine = true,
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color.Cyan,
-                        unfocusedContainerColor = Color.LightGray,
-                        focusedLabelColor = Color.Blue,
-                        unfocusedLabelColor = Color.Gray,
-                        cursorColor = Color.Red,
-                        errorCursorColor = Color.Magenta
                     )
                 )
             }
@@ -160,7 +153,55 @@ fun ProfileField(
             modifier = Modifier
                 .padding(9.dp)
                 .size(24.dp)
+                .clickable { isEditing = true } // Mở hộp thoại khi nhấn
+        )
+    }
+
+    if (isEditing) {
+        AlertDialog(
+            onDismissRequest = { isEditing = false },
+            title = { Text(text = "Edit $label") },
+            text = {
+                TextField(
+                    value = textValue,
+                    onValueChange = { newText ->
+                        textValue = newText
+                    },
+                    label = { Text("Enter new value") },
+                    modifier = Modifier.fillMaxWidth(),
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(
+                        color = Color(0xFF334A59),
+                        fontSize = 15.sp
+                    ),
+                    singleLine = true,
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedIndicatorColor = Color(0xFF80C4E9),
+                        unfocusedIndicatorColor = Color(0xFF80C4E9),
+                    )
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onValueChange(textValue)
+                        isEditing = false
+                    },
+                ) {
+                    Text("Save")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        isEditing = false
+                    },
+                ) {
+                    Text("Cancel")
+                }
+            },
+            containerColor = Color.White,
         )
     }
 }
-

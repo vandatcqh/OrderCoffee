@@ -45,6 +45,7 @@ fun MyCartScreen(navController: NavController) {
     val totalPrice = listCart.sumOf { it.TotalPrice }
 
     Scaffold(
+        containerColor = Color.White,
         bottomBar = {
             Box(
                 modifier = Modifier
@@ -80,6 +81,7 @@ fun MyCartScreen(navController: NavController) {
                             .clip(RoundedCornerShape(15.dp))
                             .background(Color.White)
                             .clickable {
+
                                 val ListBuy = personState.value.ListCart
                                 val newOrders = ListBuy.map { itemCart ->
                                     Order(
@@ -87,6 +89,9 @@ fun MyCartScreen(navController: NavController) {
                                         orderTime = LocalDateTime.now() // Gán thời gian hiện tại
                                     )
                                 }
+                                val addPoint = newOrders.sumOf { it.itemCart.TotalPoint }
+                                val addLoyalty = newOrders.sumOf { it.itemCart.quantity }
+                                personState.value = personState.value.copy(numPoint = personState.value.numPoint + addPoint, numLoyalty = personState.value.numLoyalty + addLoyalty)
                                 personState.value = personState.value.copy(ListCart = emptyList())
                                 personState.value = personState.value.copy(ListOnGoing = personState.value.ListOnGoing + newOrders)
 
@@ -129,7 +134,15 @@ fun MyCartScreen(navController: NavController) {
                     .size(30.dp)
                     .clickable { navController.popBackStack() }
             )
-            Text("My Cart", fontSize = 25.sp)
+            Text(
+                "My Cart",
+                modifier = Modifier.padding(top = 20.dp),
+                style = LocalTextStyle.current.copy(
+                    color = Color(0xFF78B3CE),
+                    fontSize = 25.sp
+                ),
+                fontWeight = FontWeight.Bold
+            )
             LazyColumn(
                 modifier = Modifier
                     .padding(paddingValues)
@@ -169,29 +182,35 @@ fun CartItem(itemCart: ItemCart, onDelete:() -> Unit) {
             ) {
                 Row(
                     modifier = Modifier
-                        .padding(vertical = 12.dp),
+                        .padding(vertical = 12.dp)
+                        .padding(end = 10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Image(
                         painter = painterResource(itemCart.coffeeProduct.imageResId),
                         contentDescription = itemCart.coffeeProduct.name,
-                        modifier = Modifier.size(90.dp, 70.dp)
+                        modifier = Modifier.size(80.dp, 60.dp)
                     )
                     Column {
-                        Text(itemCart.coffeeProduct.name, fontSize = 16.sp)
-                        Text("x${itemCart.quantity}", fontSize = 16.sp)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        )
+                        {
+                            Column {
+                                Text(itemCart.coffeeProduct.name, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                                Text("x${itemCart.quantity}", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                            }
+                            val x = itemCart.TotalPrice
+                            Text("$$x", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
+                        }
                         Text(
                             "${itemCart.shot}| ${itemCart.select}| ${itemCart.size}| ${itemCart.iceLevel}",
-                            fontSize = 12.sp
+                            fontSize = 10.sp
                         )
                     }
                 }
-                Row(
-                    modifier = Modifier.padding(end = 0.dp)
-                ) {
-                    val x = itemCart.TotalPrice
-                    Text("$$x", fontSize = 20.sp)
-                }
+
             }
         }
         item {

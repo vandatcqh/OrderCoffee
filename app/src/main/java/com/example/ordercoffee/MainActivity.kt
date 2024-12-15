@@ -35,6 +35,7 @@ import com.example.ordercoffee.ui.screens.MyOrderScreen
 import com.example.ordercoffee.ui.screens.OrderSuccess
 import java.time.LocalDateTime
 import com.example.ordercoffee.ui.screens.ProfileScreen
+import com.example.ordercoffee.ui.screens.RedeemScreen
 import com.example.ordercoffee.ui.screens.RewardScreen
 
 
@@ -78,6 +79,10 @@ fun SetupNavGraph(navController: NavHostController) {
         }
         composable("reward_screen") {
             RewardScreen(navController)
+        }
+        composable("redeem_screen")
+        {
+            RedeemScreen(navController)
         }
         composable("myorder_screen") {
             MyOrderScreen(navController)
